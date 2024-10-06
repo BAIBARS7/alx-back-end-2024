@@ -9,6 +9,13 @@ from django.contrib.auth.models import User
 from .utils import get_movie_details
 
 # View to list and create reviews
+from rest_framework import generics, permissions
+from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+from .models import Review
+from .serializers import ReviewSerializer
+
 class ReviewListCreate(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -36,6 +43,14 @@ class ReviewListCreate(generics.ListCreateAPIView):
     # Associate review with the current authenticated user
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    # Handle POST requests to create a new review
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 # View for retrieving, updating, and deleting a review
 class ReviewDetailUpdateDelete(generics.RetrieveUpdateDestroyAPIView):
