@@ -9,12 +9,6 @@ from django.contrib.auth.models import User
 from .utils import get_movie_details
 
 # View to list and create reviews
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from .models import Review
-from .serializers import ReviewSerializer
 
 class ReviewListCreate(generics.ListCreateAPIView):
     queryset = Review.objects.all()
